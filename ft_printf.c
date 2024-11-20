@@ -5,59 +5,65 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: ihhadjal <ihhadjal@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/17 10:50:08 by ihhadjal          #+#    #+#             */
-/*   Updated: 2024/11/17 14:02:04 by ihhadjal         ###   ########.fr       */
+/*   Created: 2024/11/20 10:11:40 by ihhadjal          #+#    #+#             */
+/*   Updated: 2024/11/20 10:11:49 by ihhadjal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	ft_format(va_list arg, const char str)
+static int	handle_format(va_list args, const char *format, int *i)
 {
 	int	count;
 
 	count = 0;
-	if (str == 'c')
-		count += ft_print_char(va_arg(arg, int));
-	else if (str == 's')
-		count += ft_print_str(va_arg(arg, char *));
-	else if (str == 'p')
-		count += ft_print_pointer(va_arg(arg, void *));
-	else if (str == 'd')
-		count += ft_print_decimal(va_arg(arg, int));
-	else if (str == 'i')
-		count += ft_print_decimal(va_arg(arg, int));
-	else if (str == 'u')
-		count += ft_print_unsigned(va_arg(arg, int));
-	else if (str == 'x')
-		count += ft_print_hex(va_arg(arg, int));
-	else if (str == 'X')
-		count += ft_print_hex(va_arg(arg, int));
-	else if (str == '%')
-		count += ft_print_percent();
+	if (format[*i] == 'd' || format[*i] == 'i')
+		count += ft_putnbr_fd(va_arg(args, int), 1);
+	else if (format[*i] == 's')
+		count += ft_putstr_fd(va_arg(args, char *), 1);
+	else if (format[*i] == 'c')
+		count += ft_putchar_fd((char)va_arg(args, int), 1);
+	else if (format[*i] == 'u')
+		count += ft_uputnbr_fd(va_arg(args, unsigned int), 1);
+	else if (format[*i] == 'x' || format[*i] == 'X')
+		count += ft_puthex_fd(va_arg(args, unsigned int), 1, format[*i] == 'X');
+	else if (format[*i] == 'p')
+		count += ft_putptr_fd(va_arg(args, void *), 1);
+	else if (format[*i] == '%')
+		count += ft_putchar_fd('%', 1);
 	return (count);
 }
 
-int	ft_printf(const char *str, ...)
+static int	print_format(va_list args, const char *format)
 {
-	va_list	arg;
-	int		i;
-	int		count;
+	int	i;
+	int	count;
 
-	va_start(arg, str);
 	i = 0;
 	count = 0;
-	while (str[i])
+	while (format[i])
 	{
-		if (str[i] == '%')
+		if (format[i] == '%' && format[i + 1])
 		{
-			count += ft_format(arg, str[i]);
 			i++;
+			count += handle_format(args, format, &i);
 		}
 		else
-			count += ft_print_char(str[i]);
+			count += ft_putchar_fd(format[i], 1);
 		i++;
 	}
-	va_end(arg);
+	return (count);
+}
+
+int	ft_printf(const char *format, ...)
+{
+	va_list		args;
+	int			count;
+
+	if (format == NULL)
+		return (-1);
+	va_start(args, format);
+	count = print_format(args, format);
+	va_end(args);
 	return (count);
 }

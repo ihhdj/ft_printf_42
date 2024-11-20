@@ -1,26 +1,30 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_print_str.c                                     :+:      :+:    :+:   */
+/*   ft_putptr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ihhadjal <ihhadjal@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/17 13:37:38 by ihhadjal          #+#    #+#             */
-/*   Updated: 2024/11/17 13:43:18 by ihhadjal         ###   ########.fr       */
+/*   Created: 2024/11/20 10:13:16 by ihhadjal          #+#    #+#             */
+/*   Updated: 2024/11/20 10:13:21 by ihhadjal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	ft_print_str(char *str)
+int	ft_putptr_fd(void *ptr, int fd)
 {
-	int	i;
+	unsigned long long	addr;
+	int					count;
 
-	i = 0;
-	while (str[i])
+	addr = (unsigned long long)ptr;
+	count = 0;
+	if (!ptr)
 	{
-		write(1, &str[i], 1);
-		i++;
+		count += ft_putstr_fd("(nil)", fd);
+		return (count);
 	}
-	return (i);
+	count += ft_putstr_fd("0x", fd);
+	count += ft_puthex_fd(addr, fd, 0);
+	return (count);
 }

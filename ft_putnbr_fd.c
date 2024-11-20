@@ -1,19 +1,39 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_print_percent.c                                 :+:      :+:    :+:   */
+/*   ft_putnbr_fd.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ihhadjal <ihhadjal@student.42nice.fr>      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/11/17 13:40:22 by ihhadjal          #+#    #+#             */
-/*   Updated: 2024/11/17 13:42:38 by ihhadjal         ###   ########.fr       */
+/*   Created: 2024/11/20 10:12:49 by ihhadjal          #+#    #+#             */
+/*   Updated: 2024/11/20 10:12:56 by ihhadjal         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 
-int	ft_print_percent(void)
+int	ft_putnbr_fd(int n, int fd)
 {
-	write(1, "%", 1);
-	return (1);
+	int	count;
+
+	count = 0;
+	if (n == -2147483648)
+	{
+		count = ft_putstr_fd("-2147483648", fd);
+		return (count);
+	}
+	else
+	{
+		if (n < 0)
+		{
+			count += ft_putchar_fd('-', fd);
+			n = -n;
+		}
+		if (n > 9)
+		{
+			count += ft_putnbr_fd(n / 10, fd);
+		}
+		count += ft_putchar_fd((n % 10 + '0'), fd);
+	}
+	return (count);
 }
